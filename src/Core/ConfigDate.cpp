@@ -34,6 +34,21 @@ std::string ConfigDate::getConfig() const
     return m_config;
 }
 
+bool ConfigDate::previewEnabled() const
+{
+    // 容错读取：配置损坏或字段缺失时一律视为关闭预览，
+    // 绝不因为预览设置导致采集线程抛异常。
+    try
+    {
+        const nlohmann::json j = nlohmann::json::parse(m_config);
+        return j.value("preview", false);
+    }
+    catch (...)
+    {
+        return false;
+    }
+}
+
 std::string ConfigDate::loadConfig()
 {
     if (std::filesystem::exists(ConfigFilePath))
@@ -90,7 +105,7 @@ void ConfigDate::createDefaultConfigFile(const std::string& filePath, const std:
 
 std::string ConfigDate::defaultConfig()
 {
-    const static char* defaultConfig = R"({"auto_exit": false,"auto_login":false,"auto_start": false,"account":[],"last_account":0,"num":0})";
+    const static char* defaultConfig = R"({"auto_exit": false,"auto_login":false,"auto_start": false,"preview": false,"account":[],"last_account":0,"num":0})";
     m_config = defaultConfig;
     createDefaultConfigFile(ConfigFilePath, defaultConfig);
     return defaultConfig;

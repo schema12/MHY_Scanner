@@ -9,6 +9,8 @@ public:
     void updateConfig(const std::string& config);
     std::string getConfig() const;
     std::string defaultConfig();
+    // 是否显示实时预览窗口（运行时可切换，供采集线程每帧查询）
+    bool previewEnabled() const;
 
 private:
     ConfigDate();

@@ -102,6 +102,11 @@ if(NOT DEV)
 	set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
 endif()
 
+# 与 DEV 解耦：即使 DEV=ON（为了让 #ifndef SHOW 的实时预览代码参与编译），
+# 也保持 GUI 子系统，避免多弹一个黑色控制台窗口。
+# 预览是否显示改由界面上的「显示实时预览」开关运行时控制。
+set_target_properties(${PROJECT_NAME} PROPERTIES WIN32_EXECUTABLE TRUE)
+
 set(PROJECT_LIBRARIES
 	# windows
 	Ws2_32

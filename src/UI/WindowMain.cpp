@@ -66,6 +66,7 @@ WindowMain::WindowMain(QWidget* parent) :
     connect(ui.checkBoxAutoScreen, &QCheckBox::clicked, this, &WindowMain::checkBoxAutoScreen);
     connect(ui.checkBoxAutoExit, &QCheckBox::clicked, this, &WindowMain::checkBoxAutoExit);
     connect(ui.checkBoxAutoLogin, &QCheckBox::clicked, this, &WindowMain::checkBoxAutoLogin);
+    connect(ui.checkBoxPreview, &QCheckBox::clicked, this, &WindowMain::checkBoxPreview);
     connect(ui.pBtStream, &QPushButton::clicked, this, &WindowMain::pBtStream);
     connect(ui.tableWidget, &QTableWidget::cellClicked, this, &WindowMain::getInfo);
     connect(&t1, &QRCodeForScreen::loginResults, this, &WindowMain::islogin);
@@ -447,6 +448,22 @@ void WindowMain::checkBoxAutoLogin(bool clicked)
     m_config->updateConfig(userinfo.dump());
 }
 
+void WindowMain::checkBoxPreview(bool clicked)
+{
+    // 实时预览开关：只影响采集线程是否弹出实时画面窗口，不影响识别与登录逻辑。
+    // 改动即时生效——即使当前正在监视，勾选/取消勾选也会立刻体现。
+    int state = ui.checkBoxPreview->checkState();
+    if (state == Qt::Checked)
+    {
+        userinfo["preview"] = true;
+    }
+    else if (state == Qt::Unchecked)
+    {
+        userinfo["preview"] = false;
+    }
+    m_config->updateConfig(userinfo.dump());
+}
+
 void WindowMain::liveIdError(const LiveStreamStatus status)
 {
     switch (status)
@@ -647,6 +664,11 @@ void WindowMain::configInitUpdate()
         if (userinfo["auto_login"])
         {
             ui.checkBoxAutoLogin->setChecked(true);
+        }
+        // 恢复"显示实时预览"勾选状态；旧配置没有该字段时默认不勾选（关闭预览）
+        if (userinfo.value("preview", false))
+        {
+            ui.checkBoxPreview->setChecked(true);
         }
     }
     catch (const std::exception& e)

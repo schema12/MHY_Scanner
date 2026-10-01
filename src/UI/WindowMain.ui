@@ -379,6 +379,16 @@
          </widget>
         </item>
         <item>
+         <widget class="QCheckBox" name="checkBoxPreview">
+          <property name="toolTip">
+           <string>勾选后，监视屏幕/直播间时会额外弹出一个实时画面窗口，便于确认识别情况；取消勾选则下次监视不再显示。</string>
+          </property>
+          <property name="text">
+           <string>显示实时预览</string>
+          </property>
+         </widget>
+        </item>
+        <item>
          <spacer name="optionSpacer">
           <property name="orientation">
            <enum>Qt::Horizontal</enum>

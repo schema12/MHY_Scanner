@@ -108,8 +108,13 @@ void QRCodeForScreen::LoginOfficial()
                 qrLog("saved first frame to MHY_Scanner_frame.png");
             }
 #ifndef SHOW
-            cv::imshow("Video_Stream", img);
-            cv::waitKey(1);
+            // 实时预览：由界面上的「显示实时预览」开关运行时决定，默认关闭。
+            // 不影响二维码识别与登录逻辑。
+            if (m_config->previewEnabled())
+            {
+                cv::imshow("Video_Stream", img);
+                cv::waitKey(1);
+            }
 #endif
             screenshotdxgi.doneWithFrame();
         }
@@ -234,8 +239,13 @@ void QRCodeForScreen::LoginBH3BiliBili()
                 qrLog("saved first frame to MHY_Scanner_frame.png");
             }
 #ifndef SHOW
-            cv::imshow("Video_Stream", img);
-            cv::waitKey(1);
+            // 实时预览：由界面上的「显示实时预览」开关运行时决定，默认关闭。
+            // 不影响二维码识别与登录逻辑。
+            if (m_config->previewEnabled())
+            {
+                cv::imshow("Video_Stream", img);
+                cv::waitKey(1);
+            }
 #endif
             screenshotdxgi.doneWithFrame();
         }
@@ -336,8 +346,14 @@ void QRCodeForScreen::run()
 {
     ret = ScanRet::UNKNOW;
     m_stop.store(true);
+    // 实时预览状态：由界面开关运行时决定，默认关闭。
+    bool previewWindow = false;
 #ifndef SHOW
-    cv::namedWindow("Video_Stream", cv::WINDOW_AUTOSIZE);
+    previewWindow = m_config->previewEnabled();
+    if (previewWindow)
+    {
+        cv::namedWindow("Video_Stream", cv::WINDOW_AUTOSIZE);
+    }
 #endif
     switch (servertype)
     {
@@ -351,7 +367,10 @@ void QRCodeForScreen::run()
         break;
     }
 #ifndef SHOW
-    cv::destroyWindow("Video_Stream");
+    if (previewWindow)
+    {
+        cv::destroyWindow("Video_Stream");
+    }
 #endif
 }
 

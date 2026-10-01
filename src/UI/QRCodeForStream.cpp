@@ -127,8 +127,13 @@ void QRCodeForStream::LoginOfficial()
                       dstData, dstLinesize);
             av_frame_unref(pAVFrame);
 #ifndef SHOW
-            cv::imshow("Video_Stream", img);
-            cv::waitKey(1);
+            // 实时预览：由界面上的「显示实时预览」开关运行时决定，默认关闭。
+            // 不影响二维码识别与登录逻辑。
+            if (m_config->previewEnabled())
+            {
+                cv::imshow("Video_Stream", img);
+                cv::waitKey(1);
+            }
 #endif
             ++frameCount;
             if (frameCount <= 5)
@@ -259,8 +264,13 @@ void QRCodeForStream::LoginBH3BiliBili()
                       dstData, dstLinesize);
             av_frame_unref(pAVFrame);
 #ifndef SHOW
-            cv::imshow("Video_Stream", img);
-            cv::waitKey(1);
+            // 实时预览：由界面上的「显示实时预览」开关运行时决定，默认关闭。
+            // 不影响二维码识别与登录逻辑。
+            if (m_config->previewEnabled())
+            {
+                cv::imshow("Video_Stream", img);
+                cv::waitKey(1);
+            }
 #endif
             ++frameCount;
             if (frameCount <= 5)
@@ -490,9 +500,17 @@ void QRCodeForStream::run()
     }
     else
     {
+        // 实时预览状态：由界面开关运行时决定，默认关闭。
+        // 声明在 #ifndef 之外，便于下面按同一条件销毁窗口。
+        bool previewWindow = false;
 #ifndef SHOW
-        cv::namedWindow("Video_Stream", cv::WINDOW_AUTOSIZE);
-        cv::resizeWindow("Video_Stream", videoStreamWidth / 2, videoStreamHeight / 2);
+        // 只有开启预览时才建窗；不建窗时 imshow 也会自动创建，无需额外处理。
+        previewWindow = m_config->previewEnabled();
+        if (previewWindow)
+        {
+            cv::namedWindow("Video_Stream", cv::WINDOW_AUTOSIZE);
+            cv::resizeWindow("Video_Stream", videoStreamWidth / 2, videoStreamHeight / 2);
+        }
 #endif
         switch (servertype)
         {
@@ -510,10 +528,13 @@ void QRCodeForStream::run()
         {
             emit loginResults(ret);
         }
-    }
 #ifndef SHOW
-    cv::destroyWindow("Video_Stream");
+        if (previewWindow)
+        {
+            cv::destroyWindow("Video_Stream");
+        }
 #endif
+    }
     avformat_close_input(&pAVFormatContext);
     avcodec_free_context(&pAVCodecContext);
     sws_freeContext(pSwsContext);
