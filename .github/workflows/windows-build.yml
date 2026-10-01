@@ -1,4 +1,4 @@
-﻿name: Windows Build
+name: Windows Build
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
 env:
   BUILD_CONFIGURATION: Release
   INSTALL_DIR: ${{ github.workspace }}\install
-  ZIP_NAME: MHY_Scanner_${{ github.ref_name }}.zip
+  ZIP_NAME: MHY_Scanner_1.20.1-preview.zip
   VCPKG_BINARY_SOURCES: clear;files,${{ github.workspace }}/vcpkg-cache,readwrite
 
 permissions:
@@ -53,7 +53,8 @@ jobs:
           -DVCPKG_TARGET_TRIPLET=x64-windows-static-md `
           -DCMAKE_INSTALL_PREFIX=${{ github.workspace }}\install `
           -DUNIT_TESTS=OFF `
-          -DDEV=OFF
+          -DDEV=ON `
+          -DMHY_Scanner_VERSION="1.20.1-preview"
 
       - name: Build
         run: |
